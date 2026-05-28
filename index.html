@@ -1,259 +1,279 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Whale Radar - מערכת מעקב מניות לסוחרים</title>
-  <meta name="description" content="Whale Radar מרכזת מדדי שוק, מניות במעקב, חדשות שוק, התראות מחיר, נתוני SEC וניתוח עומק למנויי VIP.">
-  <style>
-    :root{--bg:#02070b;--panel:#07131c;--line:rgba(185,231,255,.16);--text:#f4fbff;--muted:#b8ccd6;--green:#2ef29a;--green2:#0fa66a;--gold:#ffd36a;--red:#ff5b6a}
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Heebo",system-ui,sans-serif;line-height:1.7}
-    body.contrast{--bg:#000;--panel:#000;--line:#fff;--text:#fff;--muted:#fff;--green:#00ff7b}
-    body.links a{text-decoration:underline!important}
-    a{color:inherit}
-    .page{min-height:100vh;background:radial-gradient(circle at 80% 8%,rgba(46,242,154,.16),transparent 28%),radial-gradient(circle at 16% 70%,rgba(39,182,255,.12),transparent 30%),var(--bg)}
-    .wrap{width:min(1180px,100%);margin:auto;padding:28px 20px 42px}
-    header{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:56px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:28px}
-    .brand-mark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#45d7ff,var(--green));color:#00150d;font-size:24px}
-    nav{display:flex;gap:10px;flex-wrap:wrap}
-    nav a,.chip{border:1px solid var(--line);border-radius:999px;padding:9px 14px;text-decoration:none;color:#def5ee;background:rgba(7,19,28,.62)}
-    .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:42px;align-items:center}
-    .eyebrow{color:var(--green);font-weight:900;margin-bottom:12px}
-    h1{font-size:clamp(42px,7vw,76px);line-height:1;margin:0 0 18px}
-    .lead{font-size:22px;color:#d8e9ef;margin:0 0 28px;max-width:720px}
-    .actions{display:flex;gap:14px;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;padding:14px 22px;text-decoration:none;font-weight:900;border:1px solid transparent;cursor:pointer;font-size:16px}
-    .primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#00140d}
-    .secondary{border-color:var(--line);color:#fff;background:rgba(7,19,28,.72)}
-    .panel,.info-card{border:1px solid var(--line);border-radius:24px;background:rgba(7,19,28,.78);box-shadow:0 24px 80px rgba(0,0,0,.48);padding:22px}
-    .signal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-    .signal{border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;background:rgba(2,8,12,.66)}
-    .signal b{display:block;color:var(--green);font-size:26px}
-    .signal span,.info-card p,.info-card li{color:var(--muted)}
-    .warn{margin-top:18px;border:1px solid rgba(255,211,106,.28);border-radius:14px;padding:13px;color:var(--gold);background:rgba(255,211,106,.06)}
-    section.block{margin-top:56px}
-    h2{font-size:34px;margin:0 0 18px}
-    h3{margin:0 0 10px}
-    .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .plan{border:1px solid var(--line);border-radius:22px;background:rgba(7,19,28,.78);padding:22px;display:flex;flex-direction:column;min-height:100%}
-    .plan h3{font-size:25px;margin:0}
-    .price{font-size:36px;font-weight:900;color:var(--green);margin:8px 0}
-    .plan ul{padding:0 20px;margin:12px 0;color:#d5e5ec}
-    .plan li{margin:7px 0}
-    .plan .tag{margin-top:auto;color:var(--gold);font-weight:900}
-    .features,.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-    .feature{border:1px solid var(--line);border-radius:18px;background:rgba(7,19,28,.66);padding:18px}
-    .feature b{display:block;font-size:20px;margin-bottom:6px}
-    .feature span{color:var(--muted)}
-    .story{display:grid;grid-template-columns:1fr .75fr;gap:18px}
-    .story p{margin:0 0 14px;color:#d7e8ef}
-    .lead-form{border:1px solid var(--line);border-radius:24px;background:rgba(7,19,28,.8);padding:24px}
-    .lead-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-    input,select{border:1px solid rgba(255,255,255,.14);background:#041018;color:#fff;border-radius:12px;padding:13px;font-size:15px;width:100%}
-    input:focus,select:focus,button:focus,a:focus{outline:3px solid rgba(46,242,154,.34);outline-offset:2px}
-    .lead-grid button{border:0;border-radius:12px;background:linear-gradient(135deg,var(--green),var(--green2));font-weight:900;color:#00140d;font-size:15px}
-    .lead-note{margin-top:12px;color:var(--muted)}
-    .saved{color:var(--green);font-weight:900;margin-top:10px}
-    .saved.err{color:var(--red)}
-    footer{margin-top:54px;color:#98aeb8;font-size:14px;display:flex;gap:12px;flex-wrap:wrap}
-    footer a{color:var(--green)}
-    .access-btn{position:fixed;left:20px;bottom:22px;z-index:20;width:54px;height:54px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--green),#42d8ff);color:#00140d;font-weight:900;font-size:21px;box-shadow:0 12px 30px rgba(0,0,0,.35);cursor:pointer}
-    .access-panel{position:fixed;left:20px;bottom:86px;z-index:21;width:min(300px,calc(100vw - 40px));display:none;border:1px solid var(--line);border-radius:18px;background:#08131b;padding:14px;box-shadow:0 18px 60px rgba(0,0,0,.55)}
-    .access-panel.open{display:block}
-    .access-panel h3{margin:0 0 10px;font-size:17px}
-    .access-panel button{width:100%;margin:5px 0;padding:10px;border-radius:10px;border:1px solid var(--line);background:#041018;color:#fff;cursor:pointer}
-    @media(max-width:860px){header{align-items:flex-start;flex-direction:column}.hero,.plans,.features,.info-grid,.lead-grid,.story{grid-template-columns:1fr}.signal-grid{grid-template-columns:1fr}h1{font-size:42px}}
-  </style>
-</head>
-<body>
-<button class="access-btn" onclick="toggleAccess()" aria-label="פתח תפריט נגישות" title="נגישות">♿</button>
-<div class="access-panel" id="accessPanel" aria-label="תפריט נגישות">
-  <h3>כלי נגישות</h3>
-  <button onclick="fontSize(1)">הגדל טקסט</button>
-  <button onclick="fontSize(-1)">הקטן טקסט</button>
-  <button onclick="document.body.classList.toggle('contrast')">ניגודיות גבוהה</button>
-  <button onclick="document.body.classList.toggle('links')">הדגש קישורים</button>
-  <button onclick="resetAccess()">איפוס</button>
-</div>
-<main class="page">
-  <div class="wrap">
-    <header>
-      <div class="brand"><span class="brand-mark">W</span> Whale Radar</div>
-      <nav aria-label="קישורים ראשיים">
-        <a href="#about">מי אנחנו</a>
-        <a href="#plans">מסלולים</a>
-        <a href="#join">הצטרפות</a>
-        <a href="https://app.whaleradar.dev">כניסה לאפליקציה</a>
-        <a href="https://legal.whaleradar.dev">מסמכים משפטיים</a>
-      </nav>
-    </header>
+/*
+  # Whale Radar - Core Schema
 
-    <section class="hero">
-      <div>
-        <div class="eyebrow">מערכת מעקב פיננסית לסוחרים ישראלים</div>
-        <h1>דע מה הכסף הגדול עושה לפני כולם.</h1>
-        <p class="lead">Whale Radar מרכזת מניות במעקב, חדשות שוק, התראות מחיר, נתוני SEC, פעילות מוסדית וניתוח עומק למנויי VIP במסך אחד ברור ומהיר.</p>
-        <div class="actions">
-          <a class="btn primary" href="https://app.whaleradar.dev">כניסה לאפליקציה</a>
-          <a class="btn secondary" href="#join">בקשת מנוי</a>
-        </div>
-      </div>
-      <div class="panel" aria-label="יכולות מרכזיות">
-        <div class="signal-grid">
-          <div class="signal"><b>LIVE</b><span>מדדי שוק, מניות רצות וסטטוס מסחר לפי שעות וימי פעילות.</span></div>
-          <div class="signal"><b>NEWS</b><span>חדשות כלליות לכל המשתמשים, וחדשות מניות למנויי PRO ו-VIP.</span></div>
-          <div class="signal"><b>ALERTS</b><span>התראות מחיר מעל ומתחת לרף, פריצות שיאים ותנועות חריגות.</span></div>
-          <div class="signal"><b>VIP</b><span>ניתוח מעמיק לפי ממוצעים 20, 150 ו-200, חדשות חמות ודיווחים.</span></div>
-        </div>
-        <div class="warn">המידע במערכת מיועד למעקב ומחקר בלבד ואינו מהווה ייעוץ השקעות, שיווק השקעות או המלצה לפעולה.</div>
-      </div>
-    </section>
+  ## Overview
+  Full trading platform schema including:
+  - Subscription plans (Free, Basic, Pro, VIP)
+  - User profiles linked to auth.users
+  - Session locking (one active session per user, prevents code sharing)
+  - Email verification codes (6-digit OTP)
+  - Market groups with access control by subscription tier
+  - User watchlists for personalization
 
-    <section class="block" id="about">
-      <h2>מי אנחנו - רדאר לווייתן</h2>
-      <div class="story">
-        <article class="info-card">
-          <p>מאחורי Whale Radar עומד סוחר ישראלי עם למעלה מעשור של ניסיון בשוק ההון האמריקאי. לאורך השנים נצבר ידע מעשי בקריאת גרפים, ניתוח מגמות, זיהוי תנועות חריגות והבנה עמוקה של הדרך שבה השוק מתנהג בזמן אמת.</p>
-          <p>המערכת נולדה מתוך היכרות עם מציאות שחוזרת אצל סוחרים ומשקיעים ישראלים: הרצון ללמוד, להשקיע ולהצמיח את הכסף קיים, אבל חוסר הוודאות גדול ממנו. רבים מתקשים לקרוא גרף, להבין אם מניה חזקה או מדשדשת, ולהבדיל בין רעש זמני לבין תנועה משמעותית.</p>
-          <p>Whale Radar נבנתה כדי להפוך את התמונה לברורה יותר. המערכת מרכזת סריקות שוק, מניות חמות, גרפים, חדשות, דיווחים והתראות, ומציגה אותם בצורה פשוטה ונוחה יותר לקבלת החלטות מחקריות מושכלות.</p>
-          <p>חשוב להדגיש: Whale Radar אינה ייעוץ השקעות. זו מערכת מעקב וניתוח שנועדה לעזור למשתמשים לעבוד בצורה מסודרת יותר, עם פחות ניחושים ויותר מידע.</p>
-        </article>
-        <aside class="info-card">
-          <h3>מה המערכת באה לפתור</h3>
-          <ul>
-            <li>פחד וחוסר ביטחון מול גרפים.</li>
-            <li>קושי לזהות מניות חזקות מול מניות מדשדשות.</li>
-            <li>פיזור מידע בין אתרים וכלים שונים.</li>
-            <li>צורך בהתראות, חדשות וסיכום ברור במקום אחד.</li>
-          </ul>
-        </aside>
-      </div>
-    </section>
+  ## Tables
+  1. `subscription_plans` - Available plans with features and pricing
+  2. `profiles` - Extended user info and active subscription
+  3. `user_sessions` - Device/session locking, one active session per user
+  4. `verification_codes` - 6-digit OTP codes for email verification
+  5. `market_groups` - Stock categories (Tech, Energy, etc.) with required plan
+  6. `user_watchlists` - Personalized stock watchlists per user
 
-    <section class="block" id="plans">
-      <h2>מסלולי מנוי</h2>
-      <div class="plans">
-        <article class="plan">
-          <h3>BASIC</h3>
-          <div class="price">₪49</div>
-          <ul>
-            <li>עד 5 מניות במעקב אישי.</li>
-            <li>מדדי שוק, מניות רצות וחדשות כלליות של השוק.</li>
-            <li>התראות מחיר בסיסיות מעל ומתחת לרף שהמשתמש קובע.</li>
-            <li>ללא חדשות ייעודיות למניות במעקב וללא ניתוח עומק.</li>
-          </ul>
-          <div class="tag">מתאים להתחלה ומעקב בסיסי</div>
-        </article>
-        <article class="plan">
-          <h3>PRO</h3>
-          <div class="price">₪99</div>
-          <ul>
-            <li>עד 20 מניות במעקב אישי.</li>
-            <li>כל מה שכלול ב-BASIC.</li>
-            <li>חדשות למניות שהמשתמש בחר לעקוב אחריהן.</li>
-            <li>התראות מתקדמות: מעל מחיר, מתחת מחיר, פריצות שיאים ותנועות חריגות במניות במעקב.</li>
-          </ul>
-          <div class="tag">ללא ניתוח עומק - שמור ל-VIP</div>
-        </article>
-        <article class="plan">
-          <h3>VIP</h3>
-          <div class="price">₪199</div>
-          <ul>
-            <li>ללא הגבלת מניות במעקב.</li>
-            <li>כל מה שכלול ב-BASIC וב-PRO.</li>
-            <li>ניתוח מעמיק לכל מניה: ממוצע 20, ממוצע 150, ממוצע 200, מגמה, סיכון וטריגרים.</li>
-            <li>בדיקת מניות גם מחוץ לרשימת המעקב, כולל חדשות חמות, דיווחים ונתוני SEC/Insider כאשר זמינים.</li>
-          </ul>
-          <div class="tag">המסלול המלא לסוחרים פעילים</div>
-        </article>
-      </div>
-    </section>
+  ## Security
+  - RLS enabled on all tables
+  - Users can only access their own data
+  - Market groups restricted by subscription plan
+*/
 
-    <section class="block">
-      <h2>מה מקבל המשתמש בתוך האפליקציה</h2>
-      <div class="features">
-        <div class="feature"><b>אפליקציה אישית</b><span>לאחר הכנסת קוד מהמנהל המשתמש רואה את המניות, ההתראות והכלים של המנוי שלו.</span></div>
-        <div class="feature"><b>שעון מסחר</b><span>המערכת מציגה אם השוק פתוח או סגור, ומתי צפויה הפתיחה הבאה לפי ארה"ב, ישראל ואירופה.</span></div>
-        <div class="feature"><b>ניהול לקוחות</b><span>בקשת הצטרפות נכנסת לפאנל הלקוחות לאחר חיבור Supabase וסביבת Netlify.</span></div>
-      </div>
-    </section>
+-- =============================================
+-- SUBSCRIPTION PLANS
+-- =============================================
+CREATE TABLE IF NOT EXISTS subscription_plans (
+  id text PRIMARY KEY,
+  name_he text NOT NULL,
+  description_he text NOT NULL DEFAULT '',
+  price_monthly numeric NOT NULL DEFAULT 0,
+  price_yearly numeric NOT NULL DEFAULT 0,
+  features jsonb NOT NULL DEFAULT '[]',
+  color text NOT NULL DEFAULT 'blue',
+  badge_text text,
+  sort_order int NOT NULL DEFAULT 0
+);
 
-    <section class="block lead-form" id="join">
-      <h2>בקשת הצטרפות</h2>
-      <div class="lead-grid">
-        <input id="leadName" autocomplete="name" placeholder="שם מלא" aria-label="שם מלא">
-        <input id="leadPhone" autocomplete="tel" placeholder="טלפון" aria-label="טלפון">
-        <input id="leadId" placeholder="תעודת זהות" aria-label="תעודת זהות">
-        <input id="leadEmail" autocomplete="email" placeholder="אימייל" aria-label="אימייל">
-        <select id="leadPlan" aria-label="בחירת מסלול">
-          <option value="basic">BASIC</option>
-          <option value="pro">PRO</option>
-          <option value="vip">VIP</option>
-        </select>
-        <button onclick="saveLead()">שלח בקשה</button>
-      </div>
-      <div class="lead-note">לאחר שליחת הבקשה תקבל קוד מנוי מהמנהל. עם הקוד נכנסים לאפליקציה האישית בכתובת app.whaleradar.dev.</div>
-      <div class="saved" id="leadSaved" role="status" aria-live="polite"></div>
-    </section>
+ALTER TABLE subscription_plans ENABLE ROW LEVEL SECURITY;
 
-    <section class="block">
-      <h2>הגנת זכויות יוצרים</h2>
-      <article class="info-card">
-        <p>© 2026 Whale Radar - רדאר לווייתן. כל הזכויות שמורות.</p>
-        <p>התוכן המופיע באתר זה, לרבות הטקסטים, העיצוב, הממשק, הלוגו, הקוד, מבנה המערכת וחוויית המשתמש בכללותה, הינם קניינו של Whale Radar ומוגנים על פי חוקי זכויות יוצרים ודיני קניין רוחני.</p>
-        <p>אין להעתיק, לשכפל, להפיץ, לשנות, לפרסם, להציג, למכור או לעשות כל שימוש מסחרי בתכנים, במבנה או במערכת ללא אישור מראש ובכתב מבעל המערכת. כל שימוש בלתי מורשה עשוי להוביל לנקיטת צעדים משפטיים.</p>
-      </article>
-    </section>
+CREATE POLICY "Anyone can read subscription plans"
+  ON subscription_plans FOR SELECT
+  TO authenticated
+  USING (true);
 
-    <footer>
-      <span>© Whale Radar</span>
-      <a href="https://legal.whaleradar.dev/terms.html">תנאי שימוש</a>
-      <a href="https://legal.whaleradar.dev/privacy.html">מדיניות פרטיות</a>
-      <a href="https://legal.whaleradar.dev/accessibility.html">הצהרת נגישות</a>
-      <a href="https://legal.whaleradar.dev/disclaimer.html">לא ייעוץ השקעות</a>
-    </footer>
-  </div>
-</main>
-<script>
-let accessLevel=0;
-function toggleAccess(){document.getElementById('accessPanel').classList.toggle('open')}
-function fontSize(dir){accessLevel=Math.max(-1,Math.min(4,accessLevel+dir));document.documentElement.style.fontSize=(16+accessLevel*2)+'px'}
-function resetAccess(){accessLevel=0;document.documentElement.style.fontSize='';document.body.classList.remove('contrast','links')}
-function clean(value){return String(value||'').replace(/[<>]/g,'').trim()}
-async function saveLead(){
-  const saved=document.getElementById('leadSaved');
-  saved.className='saved';
-  const lead={
-    name:clean(leadName.value),
-    phone:clean(leadPhone.value),
-    id:clean(leadId.value),
-    email:clean(leadEmail.value),
-    plan:leadPlan.value,
-    source:'whaleradar.dev',
-    created:new Date().toISOString()
-  };
-  if(!lead.name||!lead.phone){
-    saved.className='saved err';
-    saved.textContent='נא למלא שם וטלפון.';
-    return;
-  }
-  saved.textContent='שולח בקשה...';
-  try{
-    const response=await fetch('/.netlify/functions/lead-request',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(lead)});
-    if(!response.ok)throw new Error('request failed');
-    const result=await response.json().catch(()=>({}));
-    saved.textContent=result.stored===false?'הבקשה נקלטה מקומית, אך יש להשלים חיבור Supabase.':'הבקשה נקלטה. נציג Whale Radar יחזור אליך עם קוד גישה.';
-  }catch(e){
-    const leads=JSON.parse(localStorage.getItem('wr_public_leads')||'[]');
-    leads.unshift(lead);
-    localStorage.setItem('wr_public_leads',JSON.stringify(leads));
-    saved.textContent='הבקשה נקלטה בדפדפן. אם לא חוזרים אליך, שלח מייל ל-whaleradar@whaleradar.dev.';
-  }
-  ['leadName','leadPhone','leadId','leadEmail'].forEach(id=>document.getElementById(id).value='');
-}
-</script>
-</body>
-</html>
+-- Seed plans
+INSERT INTO subscription_plans (id, name_he, description_he, price_monthly, price_yearly, features, color, badge_text, sort_order)
+VALUES
+  ('free', 'חינמי', 'גישה בסיסית לשוק', 0, 0,
+   '["קבוצת מניות אחת", "5 מניות במעקב", "גרפים בסיסיים", "ניתוח יומי"]',
+   'gray', NULL, 1),
+  ('basic', 'בסיסי', 'גישה מורחבת לשווקים', 49, 470,
+   '["3 קבוצות מניות", "20 מניות במעקב", "גרפים מתקדמים", "התראות מחיר", "ניתוח שבועי"]',
+   'blue', NULL, 2),
+  ('pro', 'מקצועי', 'כלים מקצועיים לסוחרים', 99, 950,
+   '["כל קבוצות המניות", "מניות ללא הגבלה", "ניתוח AI", "סיגנלים בזמן אמת", "גרפים TradingView מלאים", "תמיכה מועדפת"]',
+   'emerald', 'הכי פופולרי', 3),
+  ('vip', 'VIP', 'חבילה אקסקלוסיבית', 199, 1900,
+   '["הכל בחבילת מקצועי", "קבוצות VIP בלעדיות", "ניתוח אישי שבועי", "גישה לפני כולם לסיגנלים", "שיחת ייעוץ חודשית", "קהילה VIP פרטית"]',
+   'amber', 'VIP בלעדי', 4)
+ON CONFLICT (id) DO NOTHING;
+
+-- =============================================
+-- USER PROFILES
+-- =============================================
+CREATE TABLE IF NOT EXISTS profiles (
+  id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email text NOT NULL,
+  full_name text DEFAULT '',
+  avatar_url text DEFAULT '',
+  subscription_plan text REFERENCES subscription_plans(id) DEFAULT 'free',
+  subscription_started_at timestamptz,
+  subscription_expires_at timestamptz,
+  is_email_verified boolean DEFAULT false,
+  preferred_language text DEFAULT 'he',
+  notification_preferences jsonb DEFAULT '{"price_alerts": true, "market_news": true, "signal_alerts": true}',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own profile"
+  ON profiles FOR SELECT
+  TO authenticated
+  USING (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile"
+  ON profiles FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can insert own profile"
+  ON profiles FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = id);
+
+-- Auto-create profile on new user signup
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO profiles (id, email, full_name)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', '')
+  )
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- =============================================
+-- USER SESSIONS (DEVICE/SESSION LOCKING)
+-- =============================================
+CREATE TABLE IF NOT EXISTS user_sessions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  session_token text UNIQUE NOT NULL,
+  device_fingerprint text DEFAULT '',
+  user_agent text DEFAULT '',
+  ip_address text DEFAULT '',
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now(),
+  last_seen_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE user_sessions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own sessions"
+  ON user_sessions FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own sessions"
+  ON user_sessions FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own sessions"
+  ON user_sessions FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- =============================================
+-- EMAIL VERIFICATION CODES (OTP)
+-- =============================================
+CREATE TABLE IF NOT EXISTS verification_codes (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  email text NOT NULL,
+  code text NOT NULL,
+  purpose text NOT NULL DEFAULT 'login',
+  expires_at timestamptz NOT NULL,
+  used_at timestamptz,
+  attempts int DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE verification_codes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own verification codes"
+  ON verification_codes FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own verification codes"
+  ON verification_codes FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own verification codes"
+  ON verification_codes FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- =============================================
+-- MARKET GROUPS
+-- =============================================
+CREATE TABLE IF NOT EXISTS market_groups (
+  id text PRIMARY KEY,
+  name_he text NOT NULL,
+  description_he text NOT NULL DEFAULT '',
+  icon text NOT NULL DEFAULT 'TrendingUp',
+  required_plan text REFERENCES subscription_plans(id) DEFAULT 'free',
+  symbols text[] NOT NULL DEFAULT '{}',
+  color text NOT NULL DEFAULT 'blue',
+  gradient_from text NOT NULL DEFAULT 'from-blue-500',
+  gradient_to text NOT NULL DEFAULT 'to-blue-700',
+  is_active boolean DEFAULT true,
+  sort_order int DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE market_groups ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated users can view active market groups"
+  ON market_groups FOR SELECT
+  TO authenticated
+  USING (is_active = true);
+
+-- Seed market groups
+INSERT INTO market_groups (id, name_he, description_he, icon, required_plan, symbols, color, gradient_from, gradient_to, sort_order)
+VALUES
+  ('tech-giants', 'ענקיות הטכנולוגיה', 'FAANG ומניות הטכנולוגיה הגדולות', 'Monitor', 'free',
+   ARRAY['AAPL','GOOGL','MSFT','META','AMZN','NVDA'], 'blue', 'from-blue-500', 'to-cyan-600', 1),
+
+  ('energy', 'אנרגיה ונפט', 'חברות אנרגיה ונפט מובילות', 'Zap', 'basic',
+   ARRAY['XOM','CVX','COP','SLB','BP','OXY'], 'orange', 'from-orange-500', 'to-amber-600', 2),
+
+  ('financial', 'פיננסים ובנקאות', 'הבנקים וחברות הפיננסים הגדולות', 'DollarSign', 'basic',
+   ARRAY['JPM','BAC','GS','MS','V','MA','WFC'], 'emerald', 'from-emerald-500', 'to-teal-600', 3),
+
+  ('healthcare', 'בריאות ופארמה', 'מניות רפואה ותרופות מובילות', 'Heart', 'basic',
+   ARRAY['JNJ','PFE','UNH','ABBV','MRK','LLY'], 'rose', 'from-rose-500', 'to-pink-600', 4),
+
+  ('crypto-related', 'קריפטו ובלוקצ''יין', 'מניות הקשורות לעולם הקריפטו', 'Bitcoin', 'pro',
+   ARRAY['COIN','MSTR','MARA','RIOT','CLSK'], 'yellow', 'from-yellow-500', 'to-orange-500', 5),
+
+  ('consumer', 'צרכנות ואיכות חיים', 'מותגי צרכנות מובילים בעולם', 'ShoppingBag', 'pro',
+   ARRAY['TSLA','NKE','SBUX','MCD','DIS','NFLX'], 'violet', 'from-violet-500', 'to-purple-600', 6),
+
+  ('small-cap', 'מניות צמיחה', 'מניות קטנות עם פוטנציאל גבוה', 'Rocket', 'pro',
+   ARRAY['PLTR','SOFI','AFRM','UPST','HOOD'], 'pink', 'from-pink-500', 'to-rose-600', 7),
+
+  ('vip-signals', 'סיגנלים VIP', 'מניות עם אות מסחר חזק - בלעדי VIP', 'Crown', 'vip',
+   ARRAY['SPY','QQQ','ARKK','IWM','SOXL'], 'amber', 'from-amber-400', 'to-yellow-500', 8)
+ON CONFLICT (id) DO NOTHING;
+
+-- =============================================
+-- USER WATCHLISTS
+-- =============================================
+CREATE TABLE IF NOT EXISTS user_watchlists (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  symbol text NOT NULL,
+  notes text DEFAULT '',
+  added_at timestamptz DEFAULT now(),
+  UNIQUE(user_id, symbol)
+);
+
+ALTER TABLE user_watchlists ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own watchlist"
+  ON user_watchlists FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own watchlist"
+  ON user_watchlists FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own watchlist"
+  ON user_watchlists FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- =============================================
+-- INDEXES
+-- =============================================
+CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_token ON user_sessions(session_token);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_active ON user_sessions(user_id, is_active);
+CREATE INDEX IF NOT EXISTS idx_verification_codes_email ON verification_codes(email);
+CREATE INDEX IF NOT EXISTS idx_verification_codes_user ON verification_codes(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_watchlists_user ON user_watchlists(user_id);
+CREATE INDEX IF NOT EXISTS idx_profiles_subscription ON profiles(subscription_plan);
